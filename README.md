@@ -1,4 +1,4 @@
-<H2> Google Cloud Associate Cloud Engineer <H2>  
+# Google Cloud Associate Cloud Engineer  
 
 Course Files for Google Cloud Associate Cloud Engineer Course by Antoni Tzavelas
 
