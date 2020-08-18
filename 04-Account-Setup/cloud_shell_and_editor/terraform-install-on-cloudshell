@@ -1,0 +1,21 @@
+Initialize Cloud Shell
+Click on the "Editor" button
+Select "View" on the left hand menu
+Next, select "Toggle Hidden Files"
+Select "File" in the menu 
+Next, select "New File"
+Name this file .customize_environment
+Copy the script below and paste into the editor window
+
+#!/bin/sh
+TERRAFORM_VERSION="0.13.0"
+curl https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip > terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+unzip -o terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /usr/local/bin
+
+Select "File" then "Save"
+Select the 3 dots icon on the right hand menu
+Select restart
+Upon restart run command: terraform --version 
+You should receive a response "Terraform v0.13.0"
+Run command: terraform init 
+This will initialize Terraform

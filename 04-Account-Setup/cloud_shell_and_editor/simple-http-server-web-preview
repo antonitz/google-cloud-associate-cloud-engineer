@@ -1,0 +1,14 @@
+SimpleHTTPServer example
+
+Initialize Cloud Shell
+Copy and paste this python code right into the Cloud Shell
+
+cd `mktemp -d` \
+    && echo '<html><h1>Hello World</h1></html>' >./index.html \
+    && python -m SimpleHTTPServer 8080
+
+Hit Enter
+Click on the "Web Preview" button
+A new browser tab will open showing "Hello World" in the top left hand corner
+Close browser tab
+In the Cloud Shell, use "control + C" to cancel the SimpleHTTPServer
