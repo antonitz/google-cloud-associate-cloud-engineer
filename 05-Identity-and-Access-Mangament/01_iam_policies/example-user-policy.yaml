@@ -1,0 +1,15 @@
+bindings:
+- members:
+  - user: tonybowtieace@gmail.com
+  role: roles/storage.admin
+- members:
+  - user: larkfederlagen@gmail.com
+  role: roles/storage.objectViewer
+  condition:
+    title: expirable access
+    description: Does not grant access after Jan 2021
+    expression: request.time < timestamp('2021-01-01T00:00:00.000Z')
+etag: BwWWja0YfJA=
+version: 3
+
+

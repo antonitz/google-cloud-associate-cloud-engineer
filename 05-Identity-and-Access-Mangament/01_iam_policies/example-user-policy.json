@@ -1,0 +1,27 @@
+{
+    "bindings": [
+      {
+        "role": "roles/storage.objectViewer",
+         "members": [
+           "user:larkfederlagen@gmail.com"
+         ],
+         "condition": {
+            "title": "Expires_August_1_2021",
+            "description": "Expires on August 1, 2021",
+            "expression":
+              "request.time < timestamp('2021-08-01T00:00:00.000Z')"
+        }
+      },
+      {
+        "role": "roles/storage.admin",
+        "members": [
+          "user:tonybowtieace@gmail.com"
+        ]
+      }
+    ],
+    "etag": "BwUjMhCsNvY=",
+    "version": 3
+  }
+
+
+  
