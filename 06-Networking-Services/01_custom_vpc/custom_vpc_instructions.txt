@@ -1,0 +1,151 @@
+##Creation of the environment along with the steps to test
+
+Create the network
+
+Navigation menu > VPC Network
+Create VPC Network
+Use name “custom”
+
+Commandline use:
+gcloud compute networks create custom --project=PROJECT_NAME --description=custom\ vpc\ network --subnet-mode=custom --bgp-routing-mode=regional
+
+Subnets
+Subnet creation mode > Custom
+New Subnet
+Public
+Region > us-east1
+IP address Range >10.0.0.0/24
+Private Google Access > Off
+Leave all other options as default
+Click Done
+
+Commandline use:
+gcloud compute networks subnets create public --project=bowtieinc --range=10.0.0.0/24 --network=custom --region=us-east1
+
+Add Subnet
+
+New Subnet
+Private
+Region > us-east4
+IP address Range >10.0.5.0/24
+Private Google Access > On
+Leave all other options as default
+Click Done
+
+Click Create
+
+Commandline use:
+gcloud compute networks subnets create private --project=bowtieinc --range=10.0.5.0/24 --network=custom --region=us-east4
+
+
+Create the Storage bucket and files
+
+Navigation menu > Storage
+Create Bucket
+Pick a globally unique name > Continue
+Location Type > Region
+Location > us (multiple regions in United States)
+Click Continue
+Leave all other options as default
+
+Click Create
+
+Commandline use:
+gsutil mb gs://BUCKET_NAME
+
+Upload Files
+Use the 3 files in 03_cloud_storage_bucket
+
+Create instances
+
+Compute Engine > VM instances
+Create instance
+public-instance
+Region > us-east1-b
+Machine configuration > Machine type > e2-micro
+Firewall >  Management, security, disks, networking, sole tenancy
+Networking > Network tags > public
+Network interfaces
+Network > custom
+Subnetwork > public
+Leave all other options as default
+
+Click Create
+
+Create instance
+private-instance
+Region > us-east1-c
+Machine configuration > Machine type > e2-micro
+Firewall >  Management, security, disks, networking, sole tenancy
+Networking > Network tags > public
+Network interfaces
+Network > custom
+Subnetwork > public
+External ip > None
+Leave all other options as default
+
+Click Create
+
+Command Line 
+gcloud beta compute --project=PROJECT_NAME instances create private-vm --zone=us-east4-c --machine-type=e2-micro --subnet=private --no-address --maintenance-policy=MIGRATE --service-account=852385812993-compute@developer.gserviceaccount.com --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append --tags=private --image=debian-10-buster-v20200910 --image-project=debian-cloud --boot-disk-size=10GB --boot-disk-type=pd-standard --boot-disk-device-name=instance-1 --no-shielded-secure-boot --no-shielded-vtpm --no-shielded-integrity-monitoring --reservation-affinity=any
+
+
+Create Firewall
+
+VPC Network > Firewall > Create Firewall Rule
+public-access
+Direction of traffic > ingress
+Action on match > allow
+Targets >  Specified target tags
+Target tags > public
+Source filter > IP range
+Source IP ranges > 0.0.0.0/0
+Specified Protocols and ports
+tcp > 22
+Other protocols > icmp
+Click Create.
+
+Commandline use:
+gcloud compute --project=PROJECT_NAME firewall-rules create public-access --direction=INGRESS --priority=1000 --network=custom --action=ALLOW --rules=tcp:22,icmp --source-ranges=0.0.0.0/0 --target-tags=public
+
+
+Create Firewall Rule
+private-access
+Direction of traffic > ingress
+Action on match > allow
+Targets >  Specified target tags
+Target tags > private
+Source filter > Source tags
+Source tags > public
+Specified Protocols and ports
+tcp > 22
+Other protocols > icmp
+Click Create.
+
+Commandline use:
+gcloud compute --project=PROJECT_NAME firewall-rules create private-access --direction=INGRESS --priority=1000 --network=custom --action=ALLOW --rules=tcp:22,icmp --source-tags=public --target-tags=private
+
+
+Communication steps:
+1.Use ssh from console 
+  or to use the commandline:
+  gcloud compute ssh --project PROJECT_NAME --zone us-east1-b public-instance
+
+2.List files from bucket
+  gsutil ls gs://BUCKET_NAME
+
+3.Ping private instance
+  ping private-vm
+
+4.Log into private instance from public instance
+  gcloud compute ssh --project PROJECT_NAME --zone us-east4-c private-instance --internal-ip
+
+5.List files from bucket
+gsutil ls gs://BUCKET_NAME
+
+6.Enable Private Google Access from console
+  or to use the commandline:
+  gcloud compute networks subnets update SUBNET_NAME --region=REGION --enable-private-ip-google-access
+
+7.List files from bucket
+gsutil ls gs://BUCKET_NAME
