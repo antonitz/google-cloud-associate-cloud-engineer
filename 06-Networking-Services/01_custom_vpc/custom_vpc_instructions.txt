@@ -77,10 +77,10 @@ private-instance
 Region > us-east1-c
 Machine configuration > Machine type > e2-micro
 Firewall >  Management, security, disks, networking, sole tenancy
-Networking > Network tags > public
+Networking > Network tags > private
 Network interfaces
 Network > custom
-Subnetwork > public
+Subnetwork > private
 External ip > None
 Leave all other options as default
 
