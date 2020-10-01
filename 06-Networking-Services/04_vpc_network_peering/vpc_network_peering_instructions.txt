@@ -1,0 +1,198 @@
+##Creation of the environment along with the steps to test
+
+##Create 2 seperate projects (only if you don't have 2 projects already created)
+##Replace PROJECT_NAME with the name of your project
+
+## Create first project
+
+Top project menu > New Project
+Project name > PROJECT_NAME
+Location > No organisation
+Click Create
+
+## Create second project
+
+Top project menu > New Project
+Project name > PROJECT_NAME
+Location > No organisation
+Click Create
+
+##Create the network in first project
+
+Top project menu > First project
+Navigation menu > VPC Network
+Create VPC Network
+Use name “bowtieinc-a”
+
+Commandline use:
+gcloud compute networks create bowtieinc-a --project=PROJECT_NAME --description=bowtieinc-a --subnet-mode=custom --bgp-routing-mode=regional
+
+Subnets
+Subnet creation mode > Custom
+New Subnet
+subnet-a
+Region > us-east1
+IP address Range >10.0.0.0/20
+Leave all other options as default
+Click Done
+Click Create
+
+Commandline use:
+gcloud compute networks subnets create subnet-a --project=PROJECT_NAME --range=10.0.0.0/20 --network=custom --region=us-east1
+
+##Create the second network
+
+Top project menu > Second project
+Navigation menu > VPC Network
+Create VPC Network
+Use name “bowtieinc-b”
+
+Commandline use:
+gcloud compute networks create bowtieinc-b --project=PROJECT_NAME --description=bowtieinc-b --subnet-mode=custom --bgp-routing-mode=regional
+
+Subnets
+Subnet creation mode > Custom
+New Subnet
+subnet-b
+Region > us-east4
+IP address Range >10.4.0.0/20
+Leave all other options as default
+Click Done
+
+Commandline use:
+gcloud compute networks subnets create subnet-b --project=PROJECT_NAME --range=10.4.0.0/20 --network=custom --region=us-east4
+
+
+##Create Firewall Rules
+##Create firewall rule in first project within bowtieinc-a
+
+Top project menu > first project
+VPC Network > Firewall > Create Firewall Rule
+bowtieinc-a
+Direction of traffic > ingress
+Action on match > allow
+Targets >  All instances in the network
+Source filter > IP range
+Source IP ranges > 0.0.0.0/0
+Specified Protocols and ports
+tcp > 22
+Other protocols > icmp
+Click Create
+
+Commandline use:
+gcloud compute --project=PROJECT_NAME firewall-rules create bowtieinc-a --direction=INGRESS --priority=1000 --network=custom --action=ALLOW --rules=tcp:22,icmp --source-ranges=0.0.0.0/0
+
+
+##Create firewall rule in second project within bowtieinc-b
+
+Top project menu > second project
+VPC Network > Firewall > Create Firewall Rule
+bowtieinc-b
+Direction of traffic > ingress
+Action on match > allow
+Targets >  All instances in the network
+Source filter > IP range
+Source IP ranges > 0.0.0.0/0
+Specified Protocols and ports
+tcp > 22
+Other protocols > icmp
+Click Create
+
+Commandline use:
+gcloud compute --project=PROJECT_NAME firewall-rules create bowtieinc-b --direction=INGRESS --priority=1000 --network=custom --action=ALLOW --rules=tcp:22,icmp --source-ranges=0.0.0.0/0
+
+
+##Create instances
+
+##Create instance in 1st project within subnet-a
+
+Top project menu > first project
+Compute Engine > VM instances
+Create instance
+instance-a
+Region > us-east1
+Zone > us-east1-b
+Machine configuration > Machine type > e2-micro
+Firewall >  Management, security, disks, networking, sole tenancy
+Networking > Network interfaces
+Network > bowtieinc-a
+Subnetwork > subnet-a
+Leave all other options as default
+Click Create
+
+Command Line 
+gcloud beta compute --project=PROJECT_NAME instances create instance-a --zone=us-east1-b --machine-type=e2-micro --subnet=subnet-a --no-address --maintenance-policy=MIGRATE --service-account=852385812993-compute@developer.gserviceaccount.com --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append --image=debian-10-buster-v20200910 --image-project=debian-cloud --boot-disk-size=10GB --boot-disk-type=pd-standard --boot-disk-device-name=instance-1 --no-shielded-secure-boot --no-shielded-vtpm --no-shielded-integrity-monitoring --reservation-affinity=any
+
+
+##Create instance in second project within subnet-b
+
+Top project menu > second project
+Create instance
+instance-b
+Region > us-east4
+Zone > us-east4-c
+Machine configuration > Machine type > e2-micro
+Firewall >  Management, security, disks, networking, sole tenancy
+Networking > Network interfaces
+Network > bowtieinc-b
+Subnetwork > subnet-b
+Leave all other options as default
+Click Create
+
+Command Line 
+gcloud beta compute --project=PROJECT_NAME instances create instance-b --zone=us-east4-c --machine-type=e2-micro --subnet=subnet-b --no-address --maintenance-policy=MIGRATE --service-account=852385812993-compute@developer.gserviceaccount.com --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append --image=debian-10-buster-v20200910 --image-project=debian-cloud --boot-disk-size=10GB --boot-disk-type=pd-standard --boot-disk-device-name=instance-1 --no-shielded-secure-boot --no-shielded-vtpm --no-shielded-integrity-monitoring --reservation-affinity=any
+
+
+##Create VPC network peering connection
+
+##Create peering connection in first project
+
+Top project menu > first project
+Record the project-id of your second project
+VPC Network > VPC network peering > Create connection > Continue
+Name > peering-ab
+Your VPC network > bowtieinc-a
+Peered VPC network > In another project
+Project ID > (project-id of second project)
+VPC network name > bowtieinc-b
+Click Create
+
+Commandline
+gcloud compute networks peerings create peering-ab --network=bowtieinc-a --peer-project PROJECT_ID --peer-network bowtieinc-b
+
+##Create peering connection in second project
+
+Record the project-id of your first project
+Top project menu > second project
+VPC Network > VPC network peering > Create connection > Continue
+Name > peering-ba
+Your VPC network > bowtieinc-b
+Peered VPC network > In another project
+Project ID > (project-id of second project)
+VPC network name > bowtieinc-a
+Click Create
+
+Commandline
+gcloud compute networks peerings create peering-ba --network=bowtieinc-b --peer-project PROJECT_ID --peer-network bowtieinc-a
+
+
+##Make sure both sides of the connection have a green checkmark and say active under status in the console
+
+##Confirm that the vpc peering connection is established
+
+Communication steps:
+1.Copy ip of instance-a
+  or to use the commandline:
+  gcloud compute instances describe instance-a
+
+2.Switch to second project
+  Top project menu > second project
+  or to use the commandline:
+  gcloud config set project PROJECT_ID
+
+3.Use ssh from console 
+  or to use the commandline:
+  gcloud compute ssh --project PROJECT_NAME --zone us-east4-c instance-b
+
+3.Ping instance-a
+  ping instance-a
