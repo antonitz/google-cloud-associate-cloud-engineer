@@ -1,0 +1,6 @@
+
+
+Network         Subnet          Region          Zone          ip range
+custom          Public          us-east1        us-east1-b    10.0.0.0/24
+                Private         us-east4        us-east4-c    10.0.5.0/24
+ 
