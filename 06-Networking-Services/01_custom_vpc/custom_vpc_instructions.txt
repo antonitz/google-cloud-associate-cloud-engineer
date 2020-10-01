@@ -1,6 +1,6 @@
 ##Creation of the environment along with the steps to test
 
-Create the network
+##Create the network
 
 Navigation menu > VPC Network
 Create VPC Network
@@ -31,14 +31,13 @@ IP address Range >10.0.5.0/24
 Private Google Access > On
 Leave all other options as default
 Click Done
-
 Click Create
 
 Commandline use:
 gcloud compute networks subnets create private --project=bowtieinc --range=10.0.5.0/24 --network=custom --region=us-east4
 
 
-Create the Storage bucket and files
+##Create the Storage bucket and files
 
 Navigation menu > Storage
 Create Bucket
@@ -47,7 +46,6 @@ Location Type > Region
 Location > us (multiple regions in United States)
 Click Continue
 Leave all other options as default
-
 Click Create
 
 Commandline use:
@@ -56,12 +54,13 @@ gsutil mb gs://BUCKET_NAME
 Upload Files
 Use the 3 files in 03_cloud_storage_bucket
 
-Create instances
+##Create instances
 
 Compute Engine > VM instances
 Create instance
 public-instance
-Region > us-east1-b
+Region > us-east1
+Zone > us-east1-b
 Machine configuration > Machine type > e2-micro
 Firewall >  Management, security, disks, networking, sole tenancy
 Networking > Network tags > public
@@ -69,12 +68,12 @@ Network interfaces
 Network > custom
 Subnetwork > public
 Leave all other options as default
-
 Click Create
 
 Create instance
 private-instance
-Region > us-east1-c
+Region > us-east4
+Zone > us-east4-c
 Machine configuration > Machine type > e2-micro
 Firewall >  Management, security, disks, networking, sole tenancy
 Networking > Network tags > private
@@ -83,14 +82,13 @@ Network > custom
 Subnetwork > private
 External ip > None
 Leave all other options as default
-
 Click Create
 
 Command Line 
 gcloud beta compute --project=PROJECT_NAME instances create private-vm --zone=us-east4-c --machine-type=e2-micro --subnet=private --no-address --maintenance-policy=MIGRATE --service-account=852385812993-compute@developer.gserviceaccount.com --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append --tags=private --image=debian-10-buster-v20200910 --image-project=debian-cloud --boot-disk-size=10GB --boot-disk-type=pd-standard --boot-disk-device-name=instance-1 --no-shielded-secure-boot --no-shielded-vtpm --no-shielded-integrity-monitoring --reservation-affinity=any
 
 
-Create Firewall
+##Create Firewall Rules
 
 VPC Network > Firewall > Create Firewall Rule
 public-access
