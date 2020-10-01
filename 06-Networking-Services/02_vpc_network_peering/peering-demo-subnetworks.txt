@@ -1,0 +1,5 @@
+
+
+Network         Subnet          Region          Zone          ip range
+bowtieinc-a     subnet-a        us-east1        us-east1-b    10.0.0.0/20
+bowtieinc-a     subnet-b        us-east4        us-east4-c    10.4.0.0/20
