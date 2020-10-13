@@ -1,0 +1,170 @@
+##Create a static IP address in conjunction with creating a VM instance
+
+##Verify that a default VPC has been created
+
+Navigation menu > VPC Network
+Verify default VPC
+
+##Create static internal IP address while creating an instance
+
+Compute Engine > VM instances
+Create instance
+instance-1
+Region > us-east1
+Zone > us-east1-b
+Machine configuration > Machine type > e2-micro
+Management, security, disks, networking, sole tenancy
+Networking > Network interfaces
+Network interface > Primary Internal IP > Reserve static internal IP address
+
+Reserve a static internal IP address
+Name > static-internal
+Leave all other options as default
+Click Reserve
+Click Done
+Click Create
+
+Command Line
+gcloud beta compute --project=PROJECT_NAME instances create instance-1 --zone=us-east1-b --machine-type=e2-micro --subnet=default --private-network-ip=10.142.0.2 --network-tier=PREMIUM --maintenance-policy=MIGRATE --service-account=ACCOUNT_NUMBER-compute@developer.gserviceaccount.com --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append --image=debian-10-buster-v20200910 --image-project=debian-cloud --boot-disk-size=10GB --boot-disk-type=pd-standard --boot-disk-device-name=instance-1 --no-shielded-secure-boot --shielded-vtpm --shielded-integrity-monitoring --reservation-affinity=any
+
+Observe static IP created in the console
+
+##Verify the IP address from the command line
+
+Open cloud shell from top right hand menu
+Verify static IP address by running command in Cloud Shell:
+gcloud compute addresses list
+Observe "STATUS:IN_USE"
+
+##Verify persistance of static IP address
+
+Select instance-1
+Click on Delete in the top menu
+Verify static IP address by running command in Cloud Shell:
+gcloud compute addresses list
+Observe "STATUS:RESERVED"
+
+##Observe how to assign newly created internal static IP to new instance
+
+Compute Engine > VM instances
+Create instance
+instance-1
+Region > us-east1
+Zone > us-east1-b
+Machine configuration > Machine type > e2-micro
+Management, security, disks, networking, sole tenancy
+Networking > Network interfaces
+Network interface > Primary Internal IP > static-internal
+Click Done
+Click Cancel
+
+##Promote internal ephemeral IP address to internal static IP address
+
+Compute Engine > VM instances
+Create instance
+instance-1
+Region > us-east1
+Zone > us-east1-b
+Machine configuration > Machine type > e2-micro
+Management, security, disks, networking, sole tenancy
+Networking > Network interfaces
+Network interface > Primary Internal IP > Ephemeral
+Click Done
+Click Create
+
+Command Line
+gcloud beta compute --project=PROJECT_NAME instances create instance-1 --zone=us-east1-b --machine-type=e2-micro --subnet=default --network-tier=PREMIUM --maintenance-policy=MIGRATE --service-account=ACCOUNT_NUMBER-compute@developer.gserviceaccount.com --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append --image=debian-10-buster-v20200910 --image-project=debian-cloud --boot-disk-size=10GB --boot-disk-type=pd-standard --boot-disk-device-name=instance-1 --no-shielded-secure-boot --shielded-vtpm --shielded-integrity-monitoring --reservation-affinity=any
+
+##Promote the internal ephemeral IP address to an internal static IP address from the command line
+
+Drill down into instance-1 by clicking on it's name in the console
+Edit
+Network interfaces > nic0 default
+Internal IP type > Static
+
+Reserve static internal IP address
+Name > promoted-static
+Click Reserve
+Click Done
+Click Save
+
+Commandline use:
+gcloud compute addresses list
+gcloud compute addresses create ADDRESS_NAME --addresses INTERNAL_IP --region us-east1
+
+##Verify the IP address from the command line
+
+Open cloud shell from top right hand menu
+Verify static IP address by running command in Cloud Shell:
+gcloud compute addresses list
+Observe "promoted-static" and "STATUS:IN_USE"
+
+##Create external static IP address
+
+VPC network
+External IP addresses 
+Reserve Static address
+Name > external-static
+Description > external-static
+Network Service Tier > Premium
+IP version > IPv4
+Type > Regional
+Region > us-east1
+Attached to > None
+Click on Reserve
+
+Command Line
+gcloud compute addresses create external-static --project=PROJECT_NAME --description=external-static --region us-east1
+
+##Assign external static IP address to new instance network interface
+
+Compute Engine > VM instances
+Create instance
+instance-1
+Region > us-east1
+Zone > us-east1-b
+Machine configuration > Machine type > e2-micro
+Management, security, disks, networking, sole tenancy
+Networking > Network interfaces
+Network interface > External IP > external-static
+Click Done
+Click Create
+
+Command Line 
+gcloud beta compute --project=PROJECT_NAME instances create instance-1 --zone=us-east1-b --machine-type=e2-micro --subnet=default --address=EXTERNAL_STATIC_IP --network-tier=PREMIUM --maintenance-policy=MIGRATE --service-account=PROJECT_NUMBER-compute@developer.gserviceaccount.com --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append --image=debian-10-buster-v20200910 --image-project=debian-cloud --boot-disk-size=10GB --boot-disk-type=pd-standard --boot-disk-device-name=instance-1 --no-shielded-secure-boot --shielded-vtpm --shielded-integrity-monitoring --reservation-affinity=any
+
+##Verify the IP address from the command line
+
+Open cloud shell from top right hand menu
+Verify static IP address by running command in Cloud Shell:
+gcloud compute addresses list
+Observe "external-static" and "STATUS:IN_USE"
+
+##Promote external ephemeral IP address to external static IP address
+
+Compute Engine > VM instances
+Create instance
+Name > instance-2
+Region > us-east1
+Zone > us-east1-b
+Machine configuration > Machine type > e2-micro
+Management, security, disks, networking, sole tenancy
+Networking > Network interfaces
+Network interface > External IP > Ephemeral
+Click Done
+Click Create
+
+Command Line 
+gcloud beta compute --project=PROJECT_NAME instances create instance-1 --zone=us-east1-b --machine-type=e2-micro --subnet=default --network-tier=PREMIUM --maintenance-policy=MIGRATE --service-account=PROJECT_NUMBER-compute@developer.gserviceaccount.com --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append --image=debian-10-buster-v20200910 --image-project=debian-cloud --boot-disk-size=10GB --boot-disk-type=pd-standard --boot-disk-device-name=instance-1 --no-shielded-secure-boot --shielded-vtpm --shielded-integrity-monitoring --reservation-affinity=any
+
+##Promote external ephemeral IP address to external static IP address from the command line 
+
+Open cloud shell from top right hand menu
+Verify static IP addresses by running command in Cloud Shell:
+gcloud compute addresses list
+Observe current static IP addresses 
+Copy "External IP" from instance-2
+Promote external ephemeral IP address to external static IP address from the command line
+gcloud compute addresses create promoted-external --addresses IP_ADDRESS --region us-east1
+Verify static IP addresses by running command in Cloud Shell:
+gcloud compute addresses list
