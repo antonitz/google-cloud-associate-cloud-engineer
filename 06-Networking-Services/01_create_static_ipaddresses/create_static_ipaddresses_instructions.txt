@@ -36,7 +36,7 @@ Verify static IP address by running command in Cloud Shell:
 gcloud compute addresses list
 Observe "STATUS:IN_USE"
 
-##Verify persistance of static IP address
+##Verify persistence of static IP address
 
 Select instance-1
 Click on Delete in the top menu
