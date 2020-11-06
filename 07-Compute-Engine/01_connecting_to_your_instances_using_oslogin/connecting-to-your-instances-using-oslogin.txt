@@ -1,0 +1,95 @@
+##Verify that default VPC is created. If not create one
+
+##Only create if you do not have a default VPC network
+Navigation menu > VPC Network
+Create VPC Network
+Name > default
+Subnets > Subnet creation mode > Automatic
+Firewall Rules > Select all firewall Rules
+Click Create
+
+Commandline use:
+gcloud compute networks create default --project=PROJECT_NAME --subnet-mode=auto --mtu=1460 --bgp-routing-mode=regional
+
+##Create Linux instance to connect to
+
+Compute Engine > VM instances
+Create instance
+linux-instance
+Region > us-east1
+Zone > us-east1-b
+Machine configuration > Machine type > e2-micro
+Management, security, disks, networking, sole tenancy
+Management > Metadata
+For Key type in > enable-oslogin
+For Value type in > TRUE
+Click Done
+Record the public ip (external) of your instance from the console
+
+##Verify firewall rule has been created. If not, create it
+
+VPC Network > Firewall > Create Firewall Rule
+Name > public-access
+Direction of traffic > ingress
+Action on match > allow
+Targets >  All instances in the network
+Source filter > IP range
+Source IP ranges > 0.0.0.0/0
+Specified Protocols and ports
+tcp > 22
+Other protocols > icmp
+Click Create.
+
+Commandline use:
+gcloud compute --project=PROJECT_NAME firewall-rules create default-allow-ssh --direction=INGRESS --priority=1000 --network=default --action=ALLOW --rules=tcp:22 --source-ranges=0.0.0.0/0
+
+##If you are not using a user with the Owner role, you will need to assign permissions to that user
+
+IAM > Permissions > USER
+(If your USER has owner permissions move on to reinitializing gcloud configuration)
+Click on the pencil to edit permissions (Edit member)
+Select a role > Filter > compute os
+Choose Compute OS Login for non-root access or Compute OS Admin Login for root access
+Click Save
+
+##Reinitialize gcloud configuration
+
+Open terminal with Google Cloud SDK installed
+gcloud init > Re-initialize this configuration [default] with new settings
+Choose the account you are currently using for this demo
+Pick cloud project to use > PROJECT YOU LAUNCHED YOUR LINUX INSTANCE IN
+Do you want to configure a default Compute Region and Zone? > n
+gcloud config list  > verify
+
+##Create keypair and upload to your user account
+
+For Mac and Linux:
+ssh-keygen
+Enter file in which to save the key > Hit enter
+Enter passphrase > Use a passphrase of your choice (Please write this down otherwise you will not be able to use your key)
+Enter passphrase again
+cd .ssh
+ls > verify your keys are created
+gcloud compute os-login ssh-keys add --key-file .ssh/id_rsa.pub
+Record your Username from the output
+
+
+For Windows:
+Open Google Cloud SDK shell
+ssh-keygen
+Enter file in which to save the key > Hit enter
+Enter passphrase > Use a passphrase of your choice (Please write this down otherwise you will not be able to use your key)
+Enter passphrase again
+cd C:\Users\antoni/.ssh
+dir > verify your keys are created
+gcloud compute os-login ssh-keys add --key-file C:\Users\username/.ssh/id_rsa.pub
+Record your Username from the output
+
+##Connect to your instance using OSlogin
+
+ssh -i .ssh/id_rsa username@publicip
+
+##interact with the instance
+run command uname -a
+
+
