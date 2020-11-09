@@ -1,0 +1,97 @@
+##Verify that a default VPC has been created
+
+Navigation menu > VPC Network
+Verify default VPC
+
+##Create an instance in order to query metadata
+
+Compute Engine > VM instances
+Create instance
+Name > bowtie-webserver
+Region > us-east1
+Zone > us-east1-b
+Machine configuration > Machine type > e2-micro
+Identity and API access > Access scopes > Set access for each API 
+Compute Engine > Read/Write
+Management, security, disks, networking, sole tenancy
+Management > Metadata
+Review location of where to apply custom metadata on instance creation
+Leave all other options as default
+Click Done
+Click Create
+
+##Log into the instance
+
+Compute Engine > VM instances
+bowtie-webserver > SSH
+
+##Query metadata on the instance
+
+curl -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/
+curl -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/network
+curl -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/name
+curl -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/machine-type
+
+curl -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/project/
+curl -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/project/project-id
+
+##Create custom metadata
+
+gcloud compute instances add-metadata bowtie-webserver --metadata env=dev --zone us-east1-b
+
+##Query custom metadata
+
+curl -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/attributes/
+curl -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/attributes/env 
+
+##View custom metadata from console
+
+Compute Engine > VM instances
+bowtie-webserver > Custom metadata 
+
+##Add startup script and necessary firewall rules
+
+Compute Engine > VM instances
+bowtie-webserver > Edit
+Custom metadata
+Key > startup-script
+Value > Enter contents of bowtie-startup-1.sh 
+Firewalls
+Check "Allow HTTP traffic"
+Check "Allow HTTPS traffic"
+Click Save
+Click RESET at the top of the page
+
+##Display webpage
+
+Compute Engine > VM instances
+Copy External IP for bowtie-webserver
+Paste IP into new browser tab
+You should get a Welcome page displaying some default metadata
+
+##Upload startup script to Cloud Storage
+
+Storage > Create Bucket
+Choose a globally unique name for your Bucket
+Click Create
+Upload Files > bowtie-startup-final.sh 
+bowtie-startup-final.sh > Copy URI
+
+##Add startup script from Cloud Storage
+
+Compute Engine > VM instances
+bowtie-webserver > Edit
+Custom metadata
+Remove "startup-script" metadata
+Add new metadata
+Key > startup-script
+Value > Enter URI of bowtie-startup-final.sh
+Click Save
+Click RESET at the top of the page
+
+##Display new webpage
+
+Compute Engine > VM instances
+Copy External IP for bowtie-webserver
+Paste IP into new browser tab
+You should get a Welcome page displaying both default and custom metadata along with a pic of Tony Bowtie.
