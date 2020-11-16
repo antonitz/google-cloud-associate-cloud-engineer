@@ -19,6 +19,9 @@ bowtiepd-instance
 Region > us-east1
 Zone > us-east1-b
 Machine configuration > Machine type > e2-micro
+Identity and API access > Access scopes > Set access for each API 
+Scroll down to Compute Engine > Select Read/Write 
+Leave everything else as default 
 Click Done
 
 ##Verify firewall rule for ssh access has been created. If not, create it
