@@ -1,0 +1,131 @@
+##Verify that default VPC is created. If not create one
+
+##Only create if you do not have a default VPC network
+Navigation menu > VPC Network
+Create VPC Network
+Name > default
+Subnets > Subnet creation mode > Automatic
+Firewall Rules > Select all firewall Rules
+Click Create
+
+Commandline use:
+gcloud compute networks create default --project=PROJECT_NAME --subnet-mode=auto --mtu=1460 --bgp-routing-mode=regional
+
+##Create Linux instance to connect to
+
+Compute Engine > VM instances
+Create instance
+bowtiepd-instance
+Region > us-east1
+Zone > us-east1-b
+Machine configuration > Machine type > e2-micro
+Click Done
+
+##Verify firewall rule for ssh access has been created. If not, create it
+
+VPC Network > Firewall > Create Firewall Rule
+Name > public-access
+Direction of traffic > ingress
+Action on match > allow
+Targets >  All instances in the network
+Source filter > IP range
+Source IP ranges > 0.0.0.0/0
+Specified Protocols and ports
+tcp > 22
+Other protocols > icmp
+Click Create.
+
+Commandline use:
+gcloud compute --project=PROJECT_NAME firewall-rules create default-allow-ssh --direction=INGRESS --priority=1000 --network=default --action=ALLOW --rules=tcp:22 --source-ranges=0.0.0.0/0
+
+##Create new disk
+Compute Engine > Disks > Create Disk
+Name > newpd 
+Description > newpd 
+Type > Standard Persistent disk
+Replicate this disk within region > Check to explore, but make sure to uncheck before creation
+Region > us-east1
+Zone > us-east1-b 
+Source type > Blank disk 
+Size > 100 GB
+Observe Estimated performance
+Change Type to SSD Persistent disk
+Observe Estimated performance again and see it's performance gain
+Change Type back to Standard Persistent disk
+Encryption > Google-managed key 
+Click Create 
+
+Commandline use:
+gcloud compute disks create disk-1 --project=PROJECT_NAME --type=pd-standard --size=100GB --zone=us-east1-b
+
+##SSH into the instance to attach and interact with new disk
+##List all block devices
+lsblk
+
+##Attach new disk to instance
+gcloud compute instances attach-disk bowtie-instance --disk newpd --zone us-east1-b
+
+##List all block devices and verify your new disk
+lsblk
+
+##Look at the state that this raw block device is in
+sudo file -s /dev/sdb
+
+##Format the local SSD with an ext4 file system. This command deletes all existing data from the local SSD.
+sudo mkfs.ext4 -F /dev/sdb
+
+##Create a new mount point
+sudo mkdir /newpd
+
+##Mount the disk
+sudo mount /dev/sdb /newpd
+
+##Change directories to the new mount point and create a new file
+cd /newpd
+sudo nano fileofbowties.txt
+Type > Bowties are so classy.
+CTRL O to save
+Press Enter to verify File Name to Write
+CTRL X to exit 
+
+##Verify that the file has been created and then reboot
+ls -al
+sudo reboot
+
+##Verify that the volume is still mounted
+df -k
+
+##List block devices
+lsblk
+
+##List uuid of our newly created blk device  (uuid - universally unique identifier)
+sudo blkid /dev/sdb
+
+##Edit configuration file that controls how devices are mounted on this linux filesystem - file sets this device to mount when it starts up
+sudo nano /etc/fstab
+Append after the last line > UUID=UUID_VALUE /newpd ext4 defaults,nofail
+CTRL O to save
+Press Enter to verify File Name to Write
+CTRL X to exit
+
+##Mount device
+sudo mount -a
+df -k
+
+##Resize disk
+gcloud compute disks resize newpd --size 150 --zone us-east1-b
+
+##Extend the filesystem on the disk 
+sudo resize2fs /dev/sdb
+
+##Verify the resize
+df -k
+
+##Verify file still exists
+ls -al
+
+##Detach disk from instance
+gcloud compute instances detach-disk bowtie-instance --disk newpd --zone us-east1-b
+
+##Delete disk
+gcloud compute disks delete newpd --zone=us-east1-b 
