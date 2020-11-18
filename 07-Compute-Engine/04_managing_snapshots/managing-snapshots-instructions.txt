@@ -28,21 +28,16 @@ Click Create.
 Commandline use:
 gcloud compute --project=PROJECT_NAME firewall-rules create default-allow-ssh --direction=INGRESS --priority=1000 --network=default --action=ALLOW --rules=tcp:22 --source-ranges=0.0.0.0/0
 
-##Create Linux instance
-
-Compute Engine > VM instances
-Create instance
-Name > bowtie-instance
-Region > us-east1
-Zone > us-east1-b
-Machine configuration > Machine type > e2-micro
-Leave all other options as default 
-Click Create
-
-Commandline use:
+##Create Linux instance using command line
+##Open Cloud Shelland run command to create instance
 gcloud compute instances create bowtie-instance --zone=us-east1-b --machine-type=e2-micro --subnet=default --image=debian-10-buster-v20201112 --image-project=debian-cloud --boot-disk-size=10GB --boot-disk-type=pd-standard
 
-##SSH into the instance to create file 
+##SSH into the instance to create file from Cloud Shell
+gcloud compute ssh --zone "us-east1-b" "bowtie-instance"
+Do you want to continue? > y 
+Enter passphrase: > Enter a passphrase for your keypair
+Enter passphrase again
+Enter passphrase again
 
 ##Verify instance 
 hostname
@@ -95,11 +90,9 @@ hostname
 ##Verify if same file exists
 ls -al
 
-##Exit instance 
-exit
-
 
 ##Create snapshot schedule and attach it to disk
+##Head on over to console
 Snapshots > Create snapshot schedule 
 Name > bowtie-diskschedule
 Description > bowtie-diskschedule 
@@ -124,7 +117,14 @@ Click Save
 ##Commandline use
 gcloud compute disks add-resource-policies bowtie-instance --resource-policies bowtie-diskschedule --zone us-east1-b 
 
-##Run commands in Cloud Shell
+##Run commands in open ssh shell for bowtie-instance-2
+
+##Change user from service account user to user
+gcloud auth login
+copy authorization url and paste in browser
+you will prompted to login with your Gmail account
+login with Gmail account of your user
+copy authorization code and paste in shell 
 
 ##Create schedule
 gcloud compute resource-policies create snapshot-schedule bowtie-diskschedule-2 --region=us-east1 --max-retention-days=14 --on-source-disk-delete=apply-retention-policy --daily-schedule --start-time=06:00 --storage-location=us-east1
@@ -132,7 +132,7 @@ gcloud compute resource-policies create snapshot-schedule bowtie-diskschedule-2 
 ##Attach schedule to disk
 gcloud compute disks add-resource-policies bowtie-instance-2 --resource-policies bowtie-diskschedule-2 --zone us-east1-b
 
-##Delete all resources created 
+##Delete all resources created - in the console 
 
 ##Detach Snapshot from bowtie-instance 
 Compute Engine > Disks > bowtie-instance > edit 
@@ -145,9 +145,9 @@ Snapshot schedule > No schedule
 Save 
 
 ##Delete Snapshot and Snapshot schedules 
-Compute Engine > Snapshots > Snaphots 
+Compute Engine > Snapshots > Snapshots 
 bowtie-snapshot > Delete
-Compute Engine > Snapshots > Snaphot schedules 
+Compute Engine > Snapshots > Snapshot schedules 
 Select bowtie-diskschedule and bowtie-diskschedule-2 > Delete 
 
 ##Delete instances
