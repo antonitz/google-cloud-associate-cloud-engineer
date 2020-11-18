@@ -1,0 +1,158 @@
+##Verify that default VPC is created. If not create one
+
+##Only create if you do not have a default VPC network
+Navigation menu > VPC Network
+Create VPC Network
+Name > default
+Subnets > Subnet creation mode > Automatic
+Firewall Rules > Select all firewall Rules
+Click Create
+
+Commandline use:
+gcloud compute networks create default --project=PROJECT_NAME --subnet-mode=auto --mtu=1460 --bgp-routing-mode=regional
+
+##Verify firewall rule for ssh access has been created. If not, create it
+
+VPC Network > Firewall > Create Firewall Rule
+Name > public-access
+Direction of traffic > ingress
+Action on match > allow
+Targets >  All instances in the network
+Source filter > IP range
+Source IP ranges > 0.0.0.0/0
+Specified Protocols and ports
+tcp > 22
+Other protocols > icmp
+Click Create.
+
+Commandline use:
+gcloud compute --project=PROJECT_NAME firewall-rules create default-allow-ssh --direction=INGRESS --priority=1000 --network=default --action=ALLOW --rules=tcp:22 --source-ranges=0.0.0.0/0
+
+##Create Linux instance
+
+Compute Engine > VM instances
+Create instance
+Name > bowtie-instance
+Region > us-east1
+Zone > us-east1-b
+Machine configuration > Machine type > e2-micro
+Leave all other options as default 
+Click Create
+
+Commandline use:
+gcloud compute instances create bowtie-instance --zone=us-east1-b --machine-type=e2-micro --subnet=default --image=debian-10-buster-v20201112 --image-project=debian-cloud --boot-disk-size=10GB --boot-disk-type=pd-standard
+
+##SSH into the instance to create file 
+
+##Verify instance 
+hostname
+
+##Create file
+sudo nano fileofbowties.txt
+Type > More Bowtie Needed.
+CTRL O to save
+Press Enter to verify File Name to Write
+CTRL X to exit
+
+##Verify file 
+ls -al
+
+##Exit instance 
+exit
+
+
+##Create new snapshot
+Snapshots > Create Snapshot
+Name > bowtie-snapshot 
+Description > bowtie-snapshot 
+Source disk > bowtie-instance
+Location > Regional > us-east1 
+Click Create
+
+##Commandline use:
+gcloud compute disks snapshot bowtie-instance --snapshot-names=bowtie-snapshot --zone=us-east1-b --storage-location=us-east1
+
+##Create Linux instance from new snapshot
+
+Compute Engine > VM instances
+Create instance
+Name > bowtie-instance-2
+Region > us-east1
+Zone > us-east1-b
+Machine configuration > Machine type > e2-micro
+Leave all other options as default 
+Click Create
+
+Commandline use:
+gcloud compute instances create bowtie-instance-2 --zone=us-east1-b --machine-type=e2-micro --subnet=default --image=debian-10-buster-v20201112 --image-project=debian-cloud --boot-disk-size=10GB --boot-disk-type=pd-standard
+
+
+##SSH into the instance to verify file 
+
+##Verify instance 
+hostname
+
+##Verify if same file exists
+ls -al
+
+##Exit instance 
+exit
+
+
+##Create snapshot schedule and attach it to disk
+Snapshots > Create snapshot schedule 
+Name > bowtie-diskschedule
+Description > bowtie-diskschedule 
+Region > us-east1
+Snapshot location > Regional > us-east1
+Schedule options
+Schedule frequency > Daily
+Start time (UTC) > 06:00-07:00 
+Autodelete snapshots after > 14 days
+Deletion Rule > Delete snapshots older than 14 days
+Leave the rest as default 
+Click Create 
+
+##Commandline use
+gcloud compute resource-policies create snapshot-schedule bowtie-diskschedule --region=us-east1 --max-retention-days=14 --on-source-disk-delete=apply-retention-policy --daily-schedule --start-time=06:00
+
+##Attach schedule to disk 
+Disks > bowtie-instance > edit
+Snapshot schedule > bowtie-diskschedule 
+Click Save
+
+##Commandline use
+gcloud compute disks add-resource-policies bowtie-instance --resource-policies bowtie-diskschedule --zone us-east1-b 
+
+##Run commands in Cloud Shell
+
+##Create schedule
+gcloud compute resource-policies create snapshot-schedule bowtie-diskschedule-2 --region=us-east1 --max-retention-days=14 --on-source-disk-delete=apply-retention-policy --daily-schedule --start-time=06:00 --storage-location=us-east1
+
+##Attach schedule to disk
+gcloud compute disks add-resource-policies bowtie-instance-2 --resource-policies bowtie-diskschedule-2 --zone us-east1-b
+
+##Delete all resources created 
+
+##Detach Snapshot from bowtie-instance 
+Compute Engine > Disks > bowtie-instance > edit 
+Snapshot schedule > No schedule 
+Save 
+
+#Detach Snapshot schedule from bowtie-instance-2
+Compute Engine > Disks > bowtie-instance-2 > Edit
+Snapshot schedule > No schedule
+Save 
+
+##Delete Snapshot and Snapshot schedules 
+Compute Engine > Snapshots > Snaphots 
+bowtie-snapshot > Delete
+Compute Engine > Snapshots > Snaphot schedules 
+Select bowtie-diskschedule and bowtie-diskschedule-2 > Delete 
+
+##Delete instances
+Compute Engine > VM instances 
+Select bowtie-instance and bowtie-instance-2 > Delete 
+
+
+gcloud compute instances create instance-1 --zone=us-east1-b --machine-type=e2-micro --subnet=default --image=debian-10-buster-v20201112 --image-project=debian-cloud --boot-disk-size=10GB --boot-disk-type=pd-standard
