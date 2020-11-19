@@ -1,0 +1,29 @@
+resources:
+- name: bowtie-network
+  type: compute.v1.network
+  properties:
+    autoCreateSubnetworks: false
+- name: public
+  type: compute.v1.subnetwork
+  properties:
+    ipCidrRange: 10.0.0.0/24
+    network: $(ref.bowtie-network.selfLink)
+    privateIpGoogleAccess: false
+    region: {{ properties["region"] }}
+- name: ssh-access
+  type: compute.v1.firewall
+  properties:
+    network: $(ref.bowtie-network.selfLink)
+    sourceRanges: ["0.0.0.0/0"]
+    allowed:
+    - IPProtocol: TCP
+      ports: ["22"]
+- type: compute.v1.firewall
+  name: web-server-access
+  properties:
+    network: $(ref.bowtie-network.selfLink)
+    targetTags: ["http-server"]
+    sourceRanges: ["0.0.0.0/0"]
+    allowed:
+      - IPProtocol: TCP
+        ports: ["80"] 

@@ -1,0 +1,64 @@
+
+##Open Cloud shell in console
+Click on Cloud Shell buttton
+Open Editor
+
+##Change to dark theme (optional)
+File > Settings > Color theme > Dark (Visual Studio)
+
+##Recreate yaml and jinja files in Editor
+
+##Create folder in Editor
+File > New folder
+Rename folder "templates"
+
+##Recreate bowtie-deploy.yaml 
+Editor > File > New File 
+Rename file "bowtie-deploy.yaml"
+In the github repo, under 05_deployment_manager > copy all the content inside bowtie-deploy.yaml 
+Paste contents into bowtie-deploy.yaml 
+File > Save
+
+##Recreate bowtie-network.jinja 
+Editor > File > New File 
+Rename file "bowtie-network.jinja"
+In the github repo, under 05_deployment_manager > copy all the content inside bowtie-network.jinja 
+Paste contents into bowtie-network.jinja 
+File > Save
+
+##Recreate bowtie-webserver.jinja 
+Editor > File > New File 
+Rename file "bowtie-webserver.jinja"
+In the github repo, under 05_deployment_manager > copy all the content inside bowtie-webserver.jinja 
+Paste contents into bowtie-webserver.jinja 
+File > Save
+
+
+
+##Execute a mock deploy using "bowtie-deploy" configuration
+cd templates/
+gcloud config set project PROJECT_NAME
+gcloud deployment-manager deployments create bowtie-deploy-preview --config bowtie-deploy.yaml --preview
+
+##Deploy "bowtie-deploy" configuration
+gcloud deployment-manager deployments update bowtie-deploy
+
+##Verify manifest
+Deployment Manager > bowtie-deploy
+Verify manifest by looking through resources created.
+
+##Explore to see if deployed resources are as expected
+VPC Network > VPC Networks > bowtie-network
+Subnets > Public 
+Verify Subnets 
+Firewall > Verify new firewall rules
+ssh-access
+web-server-access 
+
+##Check website
+Compute Engine > VM instances 
+Go to public IP by using the hyperlink
+
+##SSH into instance
+Compute Engine > VM instances
+

@@ -1,0 +1,18 @@
+imports:
+- path: bowtie-webserver.jinja
+- path: bowtie-network.jinja
+
+resources:
+#Create bowtie-instance
+- name: bowtie-webserver
+  type: bowtie-webserver.jinja
+  properties:
+    zone: us-east1-b
+    machineType: f1-micro
+    network: $(ref.bowtie-network.selfLink)
+
+#Create bowtie-network
+- name: bowtie-network
+  type: bowtie-network.jinja
+  properties:
+    region: us-east1

@@ -1,0 +1,35 @@
+resources:
+- name: bowtie-website
+  type: compute.v1.instance
+  properties:
+    zone: {{ properties["zone"] }}
+    machineType: zones/{{ properties["zone"] }}/machineTypes/{{ properties["machineType"] }}
+    disks:
+    - deviceName: {{ env["name"] }}
+      type: PERSISTENT
+      boot: true
+      autoDelete: true
+      initializeParams:
+        sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/family/debian-9
+    metadata:
+      items:
+      - key: startup-script
+        value: |
+          apt-get update
+          apt-get install -y apache2
+          cat <<EOF> /var/www/html/index.html
+          <body style="font-family: sans-serif">
+          <html><body><h1>Aaaand.... Success!</h1>
+          <p>My, you look dapper today!</p>
+          <p><img src="https://storage.googleapis.com/tony-bowtie-pics/tony-bowtie.svg" alt="Tony Bowtie"></p>
+          </body></html>
+          EOF
+    tags:
+      items: ["http-server"]
+    networkInterfaces:
+    - network: $(ref.bowtie-network.selfLink)
+      subnetwork: $(ref.public.selfLink)
+      # Access Config required to give the instance a public IP address
+      accessConfigs:
+      - name: External NAT
+        type: ONE_TO_ONE_NAT
