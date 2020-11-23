@@ -38,7 +38,7 @@ File > Save
 ##Execute a mock deploy using "bowtie-deploy" configuration
 cd templates/
 gcloud config set project PROJECT_NAME
-gcloud deployment-manager deployments create bowtie-deploy-preview --config bowtie-deploy.yaml --preview
+gcloud deployment-manager deployments create bowtie-deploy --config bowtie-deploy.yaml --preview
 
 ##Deploy "bowtie-deploy" configuration
 gcloud deployment-manager deployments update bowtie-deploy
