@@ -1,0 +1,88 @@
+##Open Cloud Shell
+##Clone repository and build image
+
+cd ~
+git clone [https://github.com/antonitz/google-cloud-associate-cloud-engineer.git](https://github.com/antonitz/google-cloud-associate-cloud-engineer.git)
+cd 09-Kubernetes-Engine-and-Containers/box_of_bowties/container
+
+##Enable Cloud Build API
+gcloud services enable cloudbuild.googleapis.com
+
+##Build Docker container and push to Container Registry
+gcloud builds submit --tag gcr.io/${GOOGLE_CLOUD_PROJECT}/http://gcr.io/$%7BGOOGLE_CLOUD_PROJECT%7D/)boxofbowties:1.0.0 .
+
+##Verify Docker container build
+
+Console > Tools > Cloud Build
+History > Build > Click on the latest build
+Build Summary > Build Log > Have a look at the build
+Build Artifacts > Using the hotlink right beside the image, it will bring you to Container Registry > Build > Digest details
+
+##Click on Container Registry Heading
+
+Clicking on boxofbowties will bring you to images of your application
+Observe your images
+Settings > Public access > Visibility > Private
+
+##Deploy application 
+
+Kubernetes Engine > Workloads
+Container
+Edit container > Existing container image > Select 
+Select container image > Container registry > gcr.io/PROJECT_ID/boxofbowties > choose the current image you just built > Select
+Click Continue
+Configuration
+Application name > boxofbowties 
+Namespace > default
+Labels
+key > app 
+value > boxofbowties 
+Cluster
+Kubernetes Cluster > bowtie-cluster
+Click Deploy
+
+
+kubectl create deployment boxofbowties --image=[gcr.io/${GOOGLE_CLOUD_PROJECT}/
+boxofbowties:1.0.0 http://gcr.io/boxofbowties:1.0.6
+
+##Verify the deployment
+
+kubectl get all
+
+##Show deployments
+
+kubectl get deployments
+
+##Show pods
+
+kubectl get pods
+
+#Look at list of events for pod
+
+kubectl describe pod POD_NAME
+
+Expose Deployment using Services
+
+Kubernetes Engine > Workloads > boxofbowties
+Scroll to the bottom > Exposing services > Expose
+Port Mapping
+Port > 80
+Target port > 80
+Protocol > TCP
+Service type > Load balancer
+Service name > boxofbowties-service
+View YAML > review YAML file
+Click Expose
+
+##Create Service of type LoadBalancer to view application
+
+Services & Ingress > boxofbowties-service
+External endpoints > Click on the link 
+
+##Some may get a redirect notice as the application is not running a certificate for https 
+
+Click on the hyperlink to the IPaddress to view your application
+
+##Command line
+
+kubectl expose deployment boxofbowties-service --type=LoadBalancer --port 80 --target-port 80
