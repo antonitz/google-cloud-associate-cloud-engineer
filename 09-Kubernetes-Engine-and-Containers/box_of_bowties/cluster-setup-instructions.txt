@@ -1,0 +1,84 @@
+##Verify that a default VPC has been created
+
+Navigation menu > VPC Network
+Verify default VPC
+
+##Create a GKE cluster
+
+Navigation menu > Kubernetes Engine
+Add cluster > Create cluster
+
+Cluster basics
+
+Name > bowtie-cluster
+Location type > Zonal
+Zone > us-east1-b
+
+##Clicking on Specify default node locations will give you the options of choosing other zones for multi-zonal deployment. This demo is a regular zonal deployment
+
+Master version >Release channel
+Release channel > Regular channel
+Version > choose the default version
+
+##Configure Node pools
+
+Node Pools > Node pool details
+Name > default-pool
+Number of nodes > 3
+Enable autoscaling > Check the box
+Minimum number of nodes  > 1
+Maximum number of nodes > 3
+
+##Clicking on Specify node locations will allow you to run the same amount of nodes in multiple zones and is another way to configure multi-zonal deployment in the console. This demo is a regular zonal deployment
+
+Surge upgrade > Max surge > 1
+Surge upgrade > Max unavailable > 0
+Node Pools > default-pool > Nodes
+Image type > Container-optimized OS (cos) (default)
+Machine configuration > Machine Family
+Series > E2
+Machine type > e2-micro
+Boot disk type > Standard persistent disk
+Boot disk size > 10GB
+Leave all other options as default
+
+Node Pools > default-pool > Security > Node security
+Leave all options here as default
+Node Pools > default-pool > Metadata
+Leave all options here as default
+
+Cluster > Automation
+Leave all options here as default
+Cluster > Networking
+Public cluster > Check the box
+Network > default
+Node subnet > default
+Leave all other options as default
+
+##You can have a look around in Cluster > Security as this is the place to do any security hardening, but for this demo leave all options here as default
+
+Cluster > Metadata
+Nothing to add here
+Cluster > Features
+Operations > Enable Cloud Operations for GKE > Check the box and select > System and workload logging and monitoring
+Leave all other options as default
+Click Create
+
+Command line usage
+
+gcloud container clusters create bowtie-cluster --num-nodes 3 --zone us-east1-b ##For default install
+
+gcloud container clusters create bowtie-cluster-2 --zone us-east1-b --no-enable-basic-auth --machine-type e2-micro --disk-type pd-standard --disk-size 10 --num-nodes 3 --enable-stackdriver-kubernetes --enable-autoscaling --min-nodes 1 --max-nodes 3 --no-enable-master-authorized-networks --addons HttpLoadBalancing --enable-autoupgrade --enable-autorepair
+
+ 
+
+If you created a cluster through the Console, then you need to run the following command to retrieve the cluster's credentials and configure the kubectl command-line tool with them:
+
+gcloud container clusters get-credentials bowtie-cluster --zone us-east1-b
+
+If you created a cluster with the gcloud container clusters create command listed above, then you do not need to complete this step.
+
+##Run kubectl command to verify the configuration
+
+kubectl get pods
+kubectl get nodes
