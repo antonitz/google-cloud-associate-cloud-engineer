@@ -2,14 +2,15 @@
 ##Clone repository and build image
 
 cd ~
-git clone [https://github.com/antonitz/google-cloud-associate-cloud-engineer.git](https://github.com/antonitz/google-cloud-associate-cloud-engineer.git)
+git clone https://github.com/antonitz/google-cloud-associate-cloud-engineer.git
 cd 09-Kubernetes-Engine-and-Containers/box_of_bowties/container
+ls 
 
 ##Enable Cloud Build API
 gcloud services enable cloudbuild.googleapis.com
 
 ##Build Docker container and push to Container Registry
-gcloud builds submit --tag gcr.io/${GOOGLE_CLOUD_PROJECT}/http://gcr.io/$%7BGOOGLE_CLOUD_PROJECT%7D/)boxofbowties:1.0.0 .
+gcloud builds submit --tag gcr.io/${GOOGLE_CLOUD_PROJECT}/boxofbowties:1.0.0 .
 
 ##Verify Docker container build
 
