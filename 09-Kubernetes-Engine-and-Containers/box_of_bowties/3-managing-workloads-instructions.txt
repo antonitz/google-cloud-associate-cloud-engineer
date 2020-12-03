@@ -1,0 +1,48 @@
+##Scale deployment to 3 replicas and back down while viewing deployment of pods
+
+kubectl get pods  ##notice there is 3 pods 
+kubectl scale deployment boxofbowties --replicas=1
+kubectl get pods ##notice there are now 1 pod 
+kubectl get all  ##notice beside deployment.apps/boxofbowties desired and current is now down to 1
+kubectl scale deployment boxofbowties --replicas=3
+kubectl get pods ##notice there is 3 pods again
+
+##Apply changes to the website
+
+Open cloud shell
+cd ~
+cd google-cloud-associate-cloud-engineer/09-Kubernetes-Engine-and-Containers/box_of_bowties/container
+edit index.html
+
+##Cloud shell editor will open up
+
+Replace "What were you expecting?" with "Well, I could always use something to eat"
+File > Save
+
+Open Terminal
+
+##Rebuild container 
+
+gcloud builds submit --tag gcr.io/${GOOGLE_CLOUD_PROJECT}/boxofbowties:1.0.1
+You may get a popup asking to authorize this API call using your credentials
+Click Authorize
+
+Your new container will start building
+
+##Once built, update your site
+##Start with copying boxofbowties:1.0.1 digest hash from Container Registry
+
+Container Registry > Images > boxofbowties
+Digest details > Container Classification > Digest > Copy
+
+##Apply new digest to the Container images field for Rolling update
+
+Kubernetes Engine
+Workloads > boxofbowties
+Actions > Rolling update
+Container Images > gcr.io/PROJECT_ID/boxofbowties@COPIED_DIGEST
+View changes on website
+
+Command line use
+
+kubectl set image deployment/boxofbowties boxofbowties=gcr.io/${GOOGLE_CLOUD_PROJECT}/boxofbowties:1.0.1

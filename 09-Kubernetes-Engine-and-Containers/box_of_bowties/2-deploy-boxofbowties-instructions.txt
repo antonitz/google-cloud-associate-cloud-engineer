@@ -42,9 +42,9 @@ Cluster
 Kubernetes Cluster > bowtie-cluster
 Click Deploy
 
+##Command line use
 
-kubectl create deployment boxofbowties --image=[gcr.io/${GOOGLE_CLOUD_PROJECT}/
-boxofbowties:1.0.0 http://gcr.io/boxofbowties:1.0.6
+kubectl create deployment boxofbowties --image=gcr.io/${GOOGLE_CLOUD_PROJECT}/boxofbowties:1.0.0
 
 ##Verify the deployment
 
