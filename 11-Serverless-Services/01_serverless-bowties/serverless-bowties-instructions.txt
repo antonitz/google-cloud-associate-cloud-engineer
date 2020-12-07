@@ -1,0 +1,56 @@
+##Open Cloud Shell
+##Clone repository if you haven't already done so
+
+##If you have already cloned the course repository, you can skip this step
+
+cd ~
+git clone https://github.com/antonitz/google-cloud-associate-cloud-engineer.git 
+
+##Make sure your repo copy is up to date
+
+cd google-cloud-associate-cloud-engineer
+git pull
+cd 11-Serverless-Services/01_serverless-bowties/serverless-bowties
+
+##Launch serverless-bowties-1 
+
+cd sitev1
+gcloud app deploy --version 1
+You may get a popup asking to authorize this API call using your credentials
+Click Authorize
+Do you want to continue (Y/n)? > y 
+
+##Verify the deployment
+
+App Engine > Versions 
+Click on the Version 1 hotlink to open webpage
+You will get a redirect notice for the application 
+Click on the hyperlink to the url to view your application
+Verify webpage is displayed
+
+##Launch serverless-bowties-2 
+
+cd ../sitev2
+gcloud app deploy --version 2
+You may get a popup asking to authorize this API call using your credentials
+Click Authorize
+Do you want to continue (Y/n)? > y 
+
+##Verify the deployment
+
+App Engine > Versions 
+Click on the Version 2 hotlink to open webpage
+You will get a redirect notice for the application 
+Click on the hyperlink to the url to view your application
+Verify webpage is displayed
+
+##Migrate traffic back to Version 1
+
+Check the box next to Version 1
+At the top menu, click on 'Migrate Traffic'
+When complete, verify webpage for Version 1 is displayed
+
+##Split Traffic to both Versions
+
+
+

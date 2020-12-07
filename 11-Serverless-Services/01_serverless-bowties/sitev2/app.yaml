@@ -1,0 +1,10 @@
+runtime: python37
+service: serverless-bowties
+
+handlers:
+- url: /
+  static_files: serverless-bowties-2/index.html
+  upload: serverless-bowties-2/index.html
+
+- url: /
+  static_dir: serverless-bowties-2 
