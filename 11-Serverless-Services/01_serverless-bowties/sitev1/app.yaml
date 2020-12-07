@@ -1,5 +1,4 @@
 runtime: python37
-service: serverless-bowties
 default_expiration: '2s'
 
 handlers:
