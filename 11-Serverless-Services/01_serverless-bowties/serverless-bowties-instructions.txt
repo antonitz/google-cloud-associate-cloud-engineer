@@ -10,7 +10,7 @@ git clone https://github.com/antonitz/google-cloud-associate-cloud-engineer.git
 
 cd google-cloud-associate-cloud-engineer
 git pull
-cd 11-Serverless-Services/01_serverless-bowties/serverless-bowties
+cd 11-Serverless-Services/01_serverless-bowties
 
 ##Launch serverless-bowties-1 
 
@@ -52,5 +52,32 @@ When complete, verify webpage for Version 1 is displayed
 
 ##Split Traffic to both Versions
 
+At the top menu, click on 'Split Traffic'
+Split traffic by > Random
+Traffic allocation
+Version 2 > Allocation 50%
+Version 1 > Allocation 50%
+Click Save
 
+Commanline use:
 
+gcloud app services set-traffic SERVICE_NAME --splits VERSION1=VERSION1_WEIGHT,VERSION2=VERSION2_WEIGHT --split-by random
+
+##Verify traffic allocation 
+
+Services
+Click on the hyperlink  to the url beside your default service to view your application
+Verify webpage is displayed
+Refresh your webpage until you see Version 2 
+Refresh your webpage again until you see Version 1
+
+##Cleanup to not incur costs
+Settings > Disable application
+You will be prompted to type in your AppID 
+Type it in the box provided
+Click Disable
+
+Click on the link to your Cloud Storage bucket
+Make sure there are no files in this bucket 
+Delete the bucket named staging.PROJECT_ID.appspot.com 
+Delete the bucket named us.artifacts.PROJECT_ID.appspot.com 
