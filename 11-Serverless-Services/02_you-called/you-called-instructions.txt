@@ -1,0 +1,76 @@
+##Head over to Cloud Functions in the console
+##It may take a moment to enable the API as it's never been used before
+Cloud Functions > Create Function 
+Function name > hello_world
+Region > us-east1
+Trigger
+Trigger type > HTTP 
+Authentication > Allow unauthenticated invocations
+Click Save
+Click Next
+Leave all as default
+Click Deploy
+
+##Verify deployment
+
+gcloud functions describe hello_world --region us-east1
+
+This command should output some information on your screen and you should see a link like the one below
+httpsTrigger:
+  url: https://us-east1-PROJECT_ID.cloudfunctions.net/you_called
+Click on the link
+
+You should see in the top left hand side of your screen
+
+Hello World!
+
+##Deploy new Cloud Function by command line
+##Open Cloud Shell
+##Clone repository if you haven't already done so
+
+##If you have already cloned the course repository, you can skip this step
+
+cd ~
+git clone https://github.com/antonitz/google-cloud-associate-cloud-engineer.git 
+
+##Make sure your repo copy is up to date
+
+cd google-cloud-associate-cloud-engineer
+git pull
+cd 11-Serverless-Services/02_you-called
+ls
+
+##Look at file before deploying Function 
+edit main.py
+
+##Deploy Function
+
+gcloud functions deploy you_called --runtime python38 --trigger-http --allow-unauthenticated --region us-east1 
+You may get a popup asking to authorize this API call using your credentials
+Click Authorize
+
+
+##Verify Cloud Function
+After deployment you should see in the screen output:
+httpsTrigger:
+  url: https://us-east1-PROJECT_ID.cloudfunctions.net/you_called
+Click on the link
+
+You should see in the top left hand side of your screen
+
+Hello lover of bowties! You called?
+
+##Add you name and run the Cloud Function again
+
+Add ?name=YOUR_NAME at the end of the URL and hit enter
+You should now see in the top left hand side of your screen
+
+Hello YOUR_NAME! You called?
+
+##Cleanup
+Click on both Cloud Functions you've created
+Click on Delete at the top menu
+Head over to Storage
+Delete buckets named as gcf-sources-PROJECT_ID-REGION 
+
+?name=Antoni
