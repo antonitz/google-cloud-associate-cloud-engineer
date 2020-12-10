@@ -72,5 +72,3 @@ Click on both Cloud Functions you've created
 Click on Delete at the top menu
 Head over to Storage
 Delete buckets named as gcf-sources-PROJECT_ID-REGION 
-
-?name=Antoni
