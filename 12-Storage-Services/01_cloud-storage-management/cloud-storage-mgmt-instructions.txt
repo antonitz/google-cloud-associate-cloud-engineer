@@ -1,0 +1,146 @@
+##Create new Cloud Storage Bucket 
+##Go to Cloud Storage in the console
+Storage > Storage > Browser 
+Create Bucket
+Name > choose a globally unique name 
+Click Continue
+
+Choose where to store your data
+Region
+Location > us-east1
+Click Continue 
+
+Choose a default storage class for your data
+Standard
+Click Continue
+
+Choose how to control access to objects
+Access Control > Uniform
+Click Continue
+
+Advanced Settings 
+Encryption > Google-managed key 
+Leave the rest as it's default settings 
+Click Create 
+
+##Create an instance and copy file over to cloud storage 
+##Verify that default VPC is created. If not create one
+
+##Only create if you do not have a default VPC network
+Navigation menu > VPC Network
+Create VPC Network
+Name > default
+Subnets > Subnet creation mode > Automatic
+Firewall Rules > Select all firewall Rules
+Click Create
+
+Commandline use:
+gcloud compute networks create default --project=PROJECT_NAME --subnet-mode=auto --mtu=1460 --bgp-routing-mode=regional
+
+##Create Linux instance to copy file from instance to cloud storage bucket 
+Compute Engine > VM instances
+Create instance
+Name > bowtie-instance
+Region > us-east1
+Zone > us-east1-b
+Machine configuration > Machine type > e2-micro
+Identity and API access > Access Scopes > Set access for each API
+Storage > Read/Write
+Leave everything else as default
+Click Create
+
+##SSH into linux instance from CloudShell 
+##Open Cloudshell 
+gcloud compute ssh bowtie-instance --zone us-east1-b
+
+##Create file to copy to Cloud Storage
+sudo nano fileofbowties.txt
+Type > Learning to tie a bowtie takes time.
+CTRL O to save
+Press Enter to verify File Name to Write
+CTRL X to exit 
+
+##Copy file to Cloud Storage
+##Go to Cloudshell 
+gsutil cp fileofbowties.txt gs://antoni-bowties
+
+
+##Upload files to be managed
+##Open Cloud Shell
+##Clone repository if you haven't already done so
+
+##If you have already cloned the course repository, you can skip this step
+
+cd ~
+git clone https://github.com/antonitz/google-cloud-associate-cloud-engineer.git 
+
+##Make sure your repo copy is up to date
+
+cd google-cloud-associate-cloud-engineer
+git pull
+cd 12-Storage-Services/01_cloud-storage-management
+
+##Copy files from Cloudshell to bucket using gsutil
+gsutil cp *.jpg gs://antoni-bowties
+
+##Make bucket publicly available
+Permissions > Add user
+New members > allUsers 
+Select a role > Cloud Storage > Storage Object Viewer
+Click Save
+You will get a prompt asking you 
+Are you sure that you want to make this resource public? > Allow Public Access
+Notice the caution symbol under Public Access with Public to Internet
+Click on bucket
+Configuration > Link URL > Copy
+Open Incognito window and view the files
+
+##Remove public Permissions
+Permissions > Remove Public Permissions 
+You will get a prompt asking you:
+Remove public permissions from this bucket? > Remove Public Permissions 
+
+##Apply ACL permissions for one object 
+Click on pinkelephant.jpg > Edit Permissions
+You will be prompted with another window 
+Add Entry
+Entity > Public 
+This will autopopulate with Name=allUsers and Access=Reader
+Click Save
+Click on Public URL to verify 
+
+Commandline use: 
+gsutil acl ch -u AllUsers:R gs://BUCKETNAME/pinkelephant.jpg
+
+##Remove public access to file
+gsutil acl ch -d AllUsers gs://BUCKETNAME/pinkelephant.jpg
+
+
+##Create SignedURL for times access to file
+##Create new Service Account 
+IAM and Admin > Service Accounts > Create Service Account
+Service account details
+Service Account Name > signed-URL
+Click Create
+Grant this service account access to the project
+Select a Role > Cloud Storage > Storage Object Viewer
+Click Continue 
+Click Done 
+signed-url > Actions
+Click on the 3 dots and select Create key 
+You will receive a prompt 
+Create private key for ‘signed-url’ 
+Key Type > JSON 
+Create 
+Your key will be downloaded to your computer
+Rename your key to privatekey.json
+Open Cloud shell editor
+File > Upload Files...
+Select privatekey.json
+Navigate back to Terminal
+Open Terminal
+
+##Generate signed url for pinkelephant-bowtie.jpg 
+gsutil signurl -d 10m privatekey.json gs://BUCKETNAME/pinkelephant.jpeg
+
+Click on link to verify access to file.
