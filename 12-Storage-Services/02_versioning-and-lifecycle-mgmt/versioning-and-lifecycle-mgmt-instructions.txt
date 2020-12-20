@@ -1,0 +1,66 @@
+##Turn on versioning for the bucket you used in the last lesson
+Open up Cloudshell
+Check to see if versioning is on
+gsutil versioning get gs://BUCKETNAME 
+Next enable object versioning
+gsutil versioning set on gs://BUCKETNAME
+Verify versioning was turned on
+gsutil versioning get gs://BUCKETNAME 
+You should see Enabled
+
+##Delete object in bucket using the console
+Select plaid-bowtie.jpg > Delete
+View non current version of the currently deleted file
+gsutil ls -a gs://BUCKETNAME 
+
+##Promote non current version of plaid-bowtie.jpg to current version
+gsutil mv gs://BUCKETNAME/plaid-bowtie.jpg#generationnumber gs://BUCKETNAME/plaid-bowtie.jpg
+Verify file is in console
+Show generation number
+
+##SSH into linux instance from CloudShell
+##Open Cloudshell
+gcloud compute ssh bowtie-instance --zone us-east1-b
+
+##Edit file to copy to Cloud Storage
+sudo nano fileofbowties.txt
+Type > Learning to tie a bowtie takes time. V2
+CTRL O to save
+Press Enter to verify File Name to Write
+CTRL X to exit
+
+Type exit to exit instance
+View both current and non current version of the currently deleted file
+gsutil ls -a gs://BUCKETNAME 
+
+replace V2 with original version
+
+gsutil cp gs://BUCKETNAME/fileofbowties.txt#generationnumberforV2 gs://BUCKETNAME/fileofbowties.txt
+
+##Add Lifecycle Policy to bucket 
+Lifecycle > Add A Rule
+Select an action
+Delete Object
+Click Continue
+Select object conditions
+Days since becoming non-current > 7 days
+Click Continue
+Click Create
+Select an action
+Set storage class to Coldline
+Click Continue
+Select object conditions > 90 days
+Click Continue
+Click Create
+
+##Download current lifecycle policy to edit
+gsutil lifecycle get gs://BUCKETNAME > lifecycle.json
+sudo nano lifecycle.json
+Change age from 90 to 120.
+CTRL O to save
+Press Enter to verify File Name to Write
+CTRL X to exit
+
+##Set new lifecycle policy
+gsutil lifecycle set lifecycle.json gs://BUCKETNAME
+Refresh to see "Set to Coldline" Rule adjusted form 90 to 120
