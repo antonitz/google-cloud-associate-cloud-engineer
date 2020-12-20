@@ -62,7 +62,7 @@ CTRL X to exit
 
 ##Copy file to Cloud Storage
 ##Go to Cloudshell 
-gsutil cp fileofbowties.txt gs://antoni-bowties
+gsutil cp fileofbowties.txt gs://BUCKETNAME
 
 
 ##Upload files to be managed
@@ -81,7 +81,7 @@ git pull
 cd 12-Storage-Services/01_cloud-storage-management
 
 ##Copy files from Cloudshell to bucket using gsutil
-gsutil cp *.jpg gs://antoni-bowties
+gsutil cp *.jpg gs://BUCKETNAME
 
 ##Make bucket publicly available
 Permissions > Add user
@@ -120,16 +120,16 @@ gsutil acl ch -d AllUsers gs://BUCKETNAME/pinkelephant.jpg
 ##Create new Service Account 
 IAM and Admin > Service Accounts > Create Service Account
 Service account details
-Service Account Name > signed-URL
+Service Account Name > signedurl
 Click Create
 Grant this service account access to the project
 Select a Role > Cloud Storage > Storage Object Viewer
 Click Continue 
 Click Done 
-signed-url > Actions
+signedurl > Actions
 Click on the 3 dots and select Create key 
 You will receive a prompt 
-Create private key for ‘signed-url’ 
+Create private key for ‘signedurl’ 
 Key Type > JSON 
 Create 
 Your key will be downloaded to your computer
