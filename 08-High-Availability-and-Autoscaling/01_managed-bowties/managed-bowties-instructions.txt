@@ -1,0 +1,121 @@
+##Verify that a default VPC has been created
+
+Navigation menu > VPC Network
+Verify default VPC
+
+##Create an instance template
+
+Navigation menu > Compute Engine > Instance templates
+Create instance template 
+Name > bowtie-template 
+Machine configuration
+Series > N1
+Machine type > f1-micro
+Firewall > Check allow HTTP traffic 
+Management, security, disks, networking, sole tenancy
+Management > Startup script
+Leave all other options as default
+Click Create 
+
+##Create instance group
+
+Compute Engine > Instance groups
+Create Instance group 
+New managed instance group (stateless)
+Name > bowtie-group 
+Description > bowtie-group 
+Location > Multiple zones
+Region > us-east1 
+Instance template > bowtie-template 
+Auto-scaling
+Auto-scaling mode > Auto-scale 
+Autoscaling metrics > CPU utilisation
+Target CPU utilisation > 70%
+Click Done
+Cool-down period > 30 seconds 
+Minimum number of instances > 3
+Maximum number of instances > 6
+Autohealing > Health check > Create a health check
+Name > healthy-bowties
+Description > healthy-bowties 
+Leave all other options as default
+Click Save and continue 
+Click Create 
+
+##Create Firewall rule to allow health checks
+Navigation menu > VPC network > VPC networks
+Firewall 
+Name > allow-health-check 
+Description > allow-health-check
+Targets > All instances in the network
+Source filter > IP ranges
+Source IP ranges > 130.211.0.0/22, 35.191.0.0/16
+Protocols and ports 
+Specified protocols and ports > tcp:80
+Click Create
+
+##Create Load Balancer and add Instance Group as a backend
+Navigation menu > Network services > Load balancing
+Create load balancer 
+HTTP(S) Load Balancing > Start configuration 
+Internet facing or internal only > From Internet to my VMs
+Click Continue 
+Name > bowtie-lb
+
+##Create backend configuration
+
+Backend configuration > Backend services & backend buckets > Backend services > Create a backend service 
+Name > bowtie-backend-service
+Backend type > Instance group 
+New backend 
+Instance group > select bowtie-group
+Port numbers > 80 
+Leave all other options as default
+Click Done 
+Health check > healthy bowties 
+Click Create 
+
+##Create frontend configuration 
+Frontend configuration 
+Name > bowtie-frontend-service 
+Leave all other options as default
+Click Done 
+Click Create 
+
+##Verify that you are able to reach the website
+Click on bowtie-lb > copy IP address and paste it into a new browser tab
+It may take a couple of minutes for the service to finish being configured, so if you don't see the site, don't panic.
+
+##Run stress test to simulate scale-out
+SSH into any instance
+In the command line run the command:
+stress --cpu 2 --io 1 --vm 1 --vm-bytes 128M --timeout 30s
+This will put stress on the server itself and trigger a scale-out to handle load 
+Go to instance groups and you will see the maximum amount of instances you configured (which will be 6)
+
+##Simulate scale-in of instances 
+There is a 10min stabilization period that can not be adjusted for scale-in and is a built in feature.
+To simulate scale-in sooner, you can go to Instance Groups > bowtie-group
+Click Rolling Restart/Replace
+##Note that this should never be done in a production or a production-like environment
+##You should always let scale-in happen at it's own pace
+Observe how some instances are not brought back up and you should be left with your minimum amount of instances (which will be 3)
+
+
+##Cleanup
+##Delete Load balancer and backend service
+Network Services > Load balancing 
+Check bowtie-lb > Delete
+You will get a prompt
+Check bowtie-backend-service > Delete Load Balancer
+Backends > bowtie-backend-service > Delete 
+You will get a prompt > Delete a backend > Delete 
+
+
+##Delete instance groups
+Check bowtie-group > Delete 
+You will get a prompt > Delete 
+
+##Delete instance template 
+Check bowtie-template > Delete 
+You will get a prompt > Delete an instance template > Delete 
