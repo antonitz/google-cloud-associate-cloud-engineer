@@ -1,6 +1,8 @@
 SimpleHTTPServer example
 
 Initialize Cloud Shell
+Maybe you will have to install SimpleHTTPServer in your Cloud Shell terminal, use this command:
+"python3 -m pip install simple_http_server" (https://pypi.org/project/simple-http-server/)
 Copy and paste this python code right into the Cloud Shell
 
 cd `mktemp -d` \
