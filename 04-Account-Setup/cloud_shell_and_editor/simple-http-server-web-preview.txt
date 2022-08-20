@@ -5,7 +5,7 @@ Copy and paste this python code right into the Cloud Shell
 
 cd `mktemp -d` \
     && echo '<html><h1>Hello World</h1></html>' >./index.html \
-    && python -m SimpleHTTPServer 8080
+    && python3 -m http.server 8080
 
 Hit Enter
 Click on the "Web Preview" button
